@@ -31,7 +31,6 @@ def pugify():
                 for line in code.readlines():
                     if "templateUrl: " in line:
                         output.append(line.replace(".html", ".pug"))
-                        # "  templateUrl: './comp.component.html',\n"
                     else:
                         output.append(line)
 
