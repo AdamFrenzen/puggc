@@ -49,7 +49,7 @@ pugify
 
 Once the component has been created:
   - copy the folder's path
-  - paste the path into the terminal where it asks for it.
+  - paste the path into the terminal where it asks for it
 
 Another functionality of pugify is to delete the spec file. Answer y or n depending on whether you would like the spec file or not
 
