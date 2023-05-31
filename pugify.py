@@ -34,7 +34,6 @@ def pugify():
                         if "styleUrls:" not in line:
                             output.append(line)
 
-                print(output)
                 code.truncate(0)
                 code.seek(0)
                 code.writelines(output)
