@@ -25,7 +25,6 @@ def pugify():
             os.rename(os.path.join(folder, file), os.path.join(folder, (file.replace(".html", ".pug"))))
 
         elif "component.css" in file or "component.scss" in file:
-            # with open(os.path.join(folder, file), "r") as style:
             os.remove(os.path.join(folder, file))
 
         elif "component.ts" in file:
