@@ -1,20 +1,26 @@
 import os
+import sys
 
 
 def pugify():
 
-    folder = input("Paste the component folder's absolute path: ")
+    component_name = sys.argv[1]
+
+    command_output = os.popen("ng g c " + component_name).readlines()
+    file_path = command_output[-2].split(" ")[1]
+    folder = os.path.split(file_path)[0]
 
     try:
         os.listdir(folder)
     except FileNotFoundError:
-        print("ERROR loading path")
+        print("ERROR loading component's path")
         return
 
     for file in os.listdir(folder):
         if "component.html" in file:
             with open(os.path.join(folder, file), "w") as pug:
                 pug.truncate()
+                pug.write("p " + component_name)
 
             os.rename(os.path.join(folder, file), os.path.join(folder, (file.replace(".html", ".pug"))))
 
@@ -34,12 +40,11 @@ def pugify():
                         if "styleUrls:" not in line:
                             output.append(line)
 
-                print(output)
                 code.truncate(0)
                 code.seek(0)
                 code.writelines(output)
 
-    print("Pugification successful")
+    print("Component generated and pugified")
 
 
 if __name__ == '__main__':
