@@ -1,16 +1,17 @@
 # pugify
-Python script to reformat angular components to pug instead of html.
+Python script to create and modify angular components to pug instead of html.
+
+## Script description:
+
+A component will be created, have its css or scss file removed, and reformat html to pug.
 
 ## Setup:
 
+Make sure python is installed on your system <br />
 Download the python file, and store it anywhere on your system. 
 NOTE: You will need the file’s path
 
-Two methods to run the script:
-
-  1: type "python3 [file_path]" in the terminal
-  
-  2: Create an alias and type "pugify" in the terminal
+  ### Create an alias and type "pugify component" in the terminal:
   
   (macOS specific instructions)
 
@@ -29,30 +30,22 @@ Two methods to run the script:
     source ~/.zshrc
     ```
   
-  NOTE: You will need to restart/create a new terminal for the alias to work.
+  NOTE: You will need to restart/create a new terminal for the alias to update.
   
 ## How to use
   
-when creating a new component
+Call the alias followed by the component name in the terminal from the root directory
 
 ```
-ng g c component; python3 [file_path]
-```
-or using alias
-```
-ng g c component; pugify
-```
-or call either in the terminal whenever
-```
-pugify
+pugify component
 ```
 
-Once the component has been created:
-  - copy the folder's path
-  - paste the path into the terminal where it asks for it
+The folder will get created and reformatted to pug. 
 
-Another functionality of pugify is to delete the spec file. Answer y or n depending on whether you would like the spec file or not
+Creating components inside other components is still possible 
 
-The folder will get reformatted to pug.
+```
+pugify comp1/comp2
+```
 
   
