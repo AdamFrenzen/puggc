@@ -1,0 +1,28 @@
+{
+  "name": "puggc",
+  "version": "1.0.0",
+  "description": "Generate Angular components with pug instead of html",
+  "main": "index.js",
+  "scripts": {
+    "test": "puggc-test"
+  },
+  "bin": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdamFrenzen/pugify.git"
+  },
+  "keywords": [
+    "angular",
+    "angular component generation",
+    "angular pug"
+  ],
+  "author": "Adam Frenzen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdamFrenzen/pugify/issues"
+  },
+  "homepage": "https://github.com/AdamFrenzen/pugify#readme",
+  "dependencies": {
+    "inquirer": "^8.2.6"
+  }
+}
