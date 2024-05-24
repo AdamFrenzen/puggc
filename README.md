@@ -1,51 +1,24 @@
-# pugify
-Python script to create and modify angular components to pug instead of html.
+<div align="center">
+  <img alt="puggc" src="https://github.com/AdamFrenzen/public-repo/blob/main/puggc_readme/puggc.svg" width="650"> 
+  <p>
+    npm executable to generate Angular components with .pug files instead of .html files
+  </p>
+</div>
 
-## Script description:
+---
 
-A component will be created, have its css or scss file removed, and reformat html to pug.
+## Requirements:
+Node.js and npm installed ([installation guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 
-## Setup:
-
-Make sure python is installed on your system <br />
-Download the python file, and store it anywhere on your system. 
-NOTE: You will need the file’s path
-
-  ### Create an alias and type "pugify component" in the terminal:
-  
-  (macOS specific instructions)
-
-  - open terminal
-  - type: nano ~/.zshrc
-  text editor will open (if there is other aliases in here already, create a new line)
-  - in the text editor write (replace [file_path] with proper path): 
-    ```
-    alias pugify="python3 [file_path]"
-    ```
-  - press control+x to end editing
-  - press y to allow the changes
-  - press enter to save and exit the text editor
-  - back in the standard terminal, type the following to update the alias: 
-    ```
-    source ~/.zshrc
-    ```
-  
-  NOTE: You will need to restart/create a new terminal for the alias to update.
-  
-## How to use
-  
-Call the alias followed by the component name in the terminal from the root directory
-
+## How to use:
+Enter the puggc command in the terminal within an Angular workspace.
 ```
-pugify component
+npx puggc [component path/name]
 ```
+Answer the CLI questions to configure the component (use arrow keys and select with enter).
+<div align="center">
+  <img src="https://github.com/AdamFrenzen/public-repo/blob/main/puggc_readme/puggc-terminal.gif"> 
+</div>
 
-The folder will get created and reformatted to pug. 
-
-Creating components inside other components is still possible 
-
-```
-pugify comp1/comp2
-```
-
-  
+## Contribute:
+If you encounter any bugs or have suggestions for new features, feel free to open an issue or contribute to the project.
