@@ -81,5 +81,5 @@ function puggc(answer) {
 
   fs.writeFileSync(file(".ts"), contents);
 
-  console.log("CREATED pug component:", path);
+  console.log("\x1b[32m✓ \x1b[0mCREATED component:", path);
 }
