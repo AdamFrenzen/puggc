@@ -1,12 +1,14 @@
 {
   "name": "puggc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate Angular components with .pug instead of .html",
   "main": "index.js",
   "scripts": {
     "test": "puggc-test"
   },
-  "bin": "./index.js",
+  "bin": {
+    "puggc": "index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AdamFrenzen/puggc.git"
