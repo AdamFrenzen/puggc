@@ -37,9 +37,9 @@ function puggc(answer) {
   const output = String(nggc.stdout).split("\n")[0].split(" ")[1];
   const path = output.substring(0, output.lastIndexOf("/"));
   const name = path.split("/").at(-1);
-  const style = fs.readdirSync(path).reduce(file => {
+  const style = fs.readdirSync(path).reduce((file) => {
     if (file.includes("css")) {
-      return file.substring(file.lastIndexOf('.'));
+      return file.substring(file.lastIndexOf("."));
     }
   });
   const file = (extension) => {
