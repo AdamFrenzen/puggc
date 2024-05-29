@@ -5,6 +5,13 @@ const iq = require("inquirer");
 
 const args = process.argv.slice(2);
 if (args.length) {
+  const nggc = cp.spawnSync("ng", ["g", "c", args[0]]);
+
+  if (String(nggc.stderr)) {
+    console.log(String(nggc.stderr));
+    return;
+  }
+
   iq.prompt([
     {
       name: "style",
@@ -18,60 +25,75 @@ if (args.length) {
       type: "list",
       choices: ["include", "remove"],
     },
-  ]).then((answer) => puggc(answer));
+  ]).then((answer) => puggc(answer, nggc));
 } else {
   console.error("puggc ERROR: must pass a component name");
 }
 
-function puggc(answer) {
-  const nggc = cp.spawnSync("ng", ["g", "c", args[0]]);
+function puggc(answer, nggc) {
+  // get component files from the ng g c output
+  // nggc.stdout -> { fileType: fileName }
+  const files = String(nggc.stdout)
+    .split("\n")
+    .reduce((obj, line) => {
+      if (!line.includes("CREATE")) {
+        return obj;
+      }
 
-  if (String(nggc.stderr)) {
-    console.error(
-      "puggc ERROR: error executing ng g c - " + String(nggc.stderr)
-    );
-    return;
-  }
+      line = line.split(" ")[1];
+      const extIndex = line.lastIndexOf(".");
+      const ext = line.substring(extIndex);
 
-  // get path to component from the ng g c output
-  const output = String(nggc.stdout).split("\n")[0].split(" ")[1];
-  const path = output.substring(0, output.lastIndexOf("/"));
-  const name = path.split("/").at(-1);
-  const style = fs.readdirSync(path).reduce((file) => {
-    if (file.includes("css")) {
-      return file.substring(file.lastIndexOf("."));
-    }
-  });
-  const file = (extension) => {
-    return path + "/" + name + ".component" + extension;
-  };
+      if (ext.includes("css")) {
+        obj.style = line;
+        obj.stylePref = line.substring(0, extIndex) + answer.style;
+      }
+      if (ext === ".html") {
+        obj.html = line;
+        obj.pug = line.substring(0, extIndex) + ".pug";
+      }
+      if (ext === ".ts") {
+        const ext2Index = line.lastIndexOf(".", extIndex - 1);
+        if (line.substring(ext2Index) === ".spec.ts") {
+          obj.spec = line;
+        } else {
+          obj.ts = line;
+        }
+      }
 
-  fs.renameSync(file(".html"), file(".pug"));
-  fs.writeFileSync(file(".pug"), "p " + name + " works!");
+      return obj;
+    }, {});
+
+  fs.renameSync(files.html, files.pug);
+  const componentName = args[0].substring(args[0].lastIndexOf("/") + 1);
+  fs.writeFileSync(files.pug, "p " + componentName + " works!");
 
   if (answer.style === "none") {
-    fs.rmSync(file(style));
+    fs.rmSync(files.style);
   } else {
-    fs.renameSync(file(style), file("." + answer.style));
+    fs.renameSync(files.style, files.stylePref);
   }
 
   if (answer.spec === "remove") {
-    fs.rmSync(file(".spec.ts"));
+    fs.rmSync(files.spec);
   }
 
-  const contents = String(fs.readFileSync(file(".ts")))
+  const contents = String(fs.readFileSync(files.ts))
     .split("\n")
     .map((line) => {
       if (line.includes("templateUrl:")) {
         return line.replace(".html", ".pug");
       }
 
-      if (line.includes("styleUrl:")) {
+      if (line.includes("styleUrl")) {
         if (answer.style === "none") {
           return undefined;
         }
 
-        return line.replace(style, answer.style);
+        return line.replace(
+          files.style.substring(files.style.lastIndexOf(".")),
+          answer.style
+        );
       }
 
       return line;
@@ -79,7 +101,14 @@ function puggc(answer) {
     .filter((line) => line !== undefined)
     .join("\n");
 
-  fs.writeFileSync(file(".ts"), contents);
+  fs.writeFileSync(files.ts, contents);
 
-  console.log("\x1b[32m✓ \x1b[0mCREATED component:", path);
+  const terminalColor = (color, text) => {
+    return color + text;
+  };
+  const green = (text) => terminalColor("\x1b[32m", text);
+  const reset = (text) => terminalColor("\x1b[0m", text);
+  const cyan = (text) => terminalColor("\x1b[36m", text);
+
+  console.log(green("✓"), reset("CREATED component:"), cyan(files.ts));
 }
