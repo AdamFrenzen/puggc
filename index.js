@@ -55,7 +55,8 @@ function puggc(answer) {
         obj.pug = line.substring(0, extIndex) + ".pug";
       }
       if (ext === ".ts") {
-        if (line.substring(line.lastIndexOf(".", extIndex - 1)) === ".spec") {
+        const ext2Index = line.lastIndexOf(".", extIndex - 1);
+        if (line.substring(ext2Index) === ".spec.ts") {
           obj.spec = line;
         } else {
           obj.ts = line;
@@ -65,45 +66,36 @@ function puggc(answer) {
       return obj;
     }, {});
 
-  const output = String(nggc.stdout).split("\n")[0].split(" ")[1];
-  const path = output.substring(0, output.lastIndexOf("/"));
-  const name = path.split("/").at(-1);
-
-  const style = fs
-    .readdirSync(path)
-    .map((file) => file.substring(file.lastIndexOf(".")))
-    .find((ext) => ext.includes("css"));
-
-  const file = (extension) => {
-    return path + "/" + name + ".component" + extension;
-  };
-
-  fs.renameSync(file(".html"), file(".pug"));
-  fs.writeFileSync(file(".pug"), "p " + name + " works!");
+  fs.renameSync(files.html, files.pug);
+  const componentName = args[0].substring(args[0].lastIndexOf("/") + 1);
+  fs.writeFileSync(files.pug, "p " + componentName + " works!");
 
   if (answer.style === "none") {
-    fs.rmSync(file(style));
+    fs.rmSync(files.style);
   } else {
-    fs.renameSync(file(style), file("." + answer.style));
+    fs.renameSync(files.style, files.stylePref);
   }
 
   if (answer.spec === "remove") {
-    fs.rmSync(file(".spec.ts"));
+    fs.rmSync(files.spec);
   }
 
-  const contents = String(fs.readFileSync(file(".ts")))
+  const contents = String(fs.readFileSync(files.ts))
     .split("\n")
     .map((line) => {
       if (line.includes("templateUrl:")) {
         return line.replace(".html", ".pug");
       }
 
-      if (line.includes("styleUrl:")) {
+      if (line.includes("styleUrl")) {
         if (answer.style === "none") {
           return undefined;
         }
 
-        return line.replace(style, answer.style);
+        return line.replace(
+          files.style.substring(files.style.lastIndexOf(".")),
+          answer.style
+        );
       }
 
       return line;
@@ -111,7 +103,7 @@ function puggc(answer) {
     .filter((line) => line !== undefined)
     .join("\n");
 
-  fs.writeFileSync(file(".ts"), contents);
+  fs.writeFileSync(files.ts, contents);
 
   console.log("\x1b[32m✓ \x1b[0mCREATED component:", path);
 }
