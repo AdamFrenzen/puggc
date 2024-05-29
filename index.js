@@ -5,6 +5,13 @@ const iq = require("inquirer");
 
 const args = process.argv.slice(2);
 if (args.length) {
+  const nggc = cp.spawnSync("ng", ["g", "c", args[0]]);
+
+  if (String(nggc.stderr)) {
+    console.log(String(nggc.stderr));
+    return;
+  }
+
   iq.prompt([
     {
       name: "style",
@@ -18,21 +25,12 @@ if (args.length) {
       type: "list",
       choices: ["include", "remove"],
     },
-  ]).then((answer) => puggc(answer));
+  ]).then((answer) => puggc(answer, nggc));
 } else {
   console.error("puggc ERROR: must pass a component name");
 }
 
-function puggc(answer) {
-  const nggc = cp.spawnSync("ng", ["g", "c", args[0]]);
-
-  if (String(nggc.stderr)) {
-    console.error(
-      "puggc ERROR: error executing ng g c - " + String(nggc.stderr)
-    );
-    return;
-  }
-
+function puggc(answer, nggc) {
   // get component files from the ng g c output
   // nggc.stdout -> { fileType: fileName }
   const files = String(nggc.stdout)
