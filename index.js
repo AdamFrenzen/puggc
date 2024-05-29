@@ -33,7 +33,38 @@ function puggc(answer) {
     return;
   }
 
-  // get path to component from the ng g c output
+  // get component files from the ng g c output
+  // nggc.stdout -> { fileType: fileName }
+  const files = String(nggc.stdout)
+    .split("\n")
+    .reduce((obj, line) => {
+      if (!line.includes("CREATE")) {
+        return obj;
+      }
+
+      line = line.split(" ")[1];
+      const extIndex = line.lastIndexOf(".");
+      const ext = line.substring(extIndex);
+
+      if (ext.includes("css")) {
+        obj.style = line;
+        obj.stylePref = line.substring(0, extIndex) + answer.style;
+      }
+      if (ext === ".html") {
+        obj.html = line;
+        obj.pug = line.substring(0, extIndex) + ".pug";
+      }
+      if (ext === ".ts") {
+        if (line.substring(line.lastIndexOf(".", extIndex - 1)) === ".spec") {
+          obj.spec = line;
+        } else {
+          obj.ts = line;
+        }
+      }
+
+      return obj;
+    }, {});
+
   const output = String(nggc.stdout).split("\n")[0].split(" ")[1];
   const path = output.substring(0, output.lastIndexOf("/"));
   const name = path.split("/").at(-1);
