@@ -105,5 +105,12 @@ function puggc(answer) {
 
   fs.writeFileSync(files.ts, contents);
 
-  console.log("\x1b[32m✓ \x1b[0mCREATED component:", path);
+  const terminalColor = (color, text) => {
+    return color + text;
+  };
+  const green = (text) => terminalColor("\x1b[32m", text);
+  const reset = (text) => terminalColor("\x1b[0m", text);
+  const cyan = (text) => terminalColor("\x1b[36m", text);
+
+  console.log(green("✓"), reset("CREATED component:"), cyan(files.ts));
 }
