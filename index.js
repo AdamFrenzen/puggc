@@ -1,18 +1,24 @@
 #!/usr/bin/env node
-const fs = require("node:fs");
-const cp = require("node:child_process");
-const iq = require("inquirer");
+const fileSystem = require("node:fs");
+const childProcess = require("node:child_process");
+const inquirer = require("inquirer");
 
 const args = process.argv.slice(2);
-if (args.length) {
-  const nggc = cp.spawnSync("ng", ["g", "c", args[0]]);
 
-  if (String(nggc.stderr)) {
-    console.log(String(nggc.stderr));
-    return;
-  }
+if (!args.length) {
+  console.error("puggc ERROR: must pass a component name");
+  return;
+}
 
-  iq.prompt([
+const nggc = childProcess.spawnSync("ng", ["g", "c", args[0]]);
+
+if (nggc.stderr) {
+  console.error(String(nggc.stderr).trim());
+  return;
+}
+
+inquirer
+  .prompt([
     {
       name: "style",
       message: "Component stylesheet file type:",
@@ -25,10 +31,8 @@ if (args.length) {
       type: "list",
       choices: ["include", "remove"],
     },
-  ]).then((answer) => puggc(answer, nggc));
-} else {
-  console.error("puggc ERROR: must pass a component name");
-}
+  ])
+  .then((answer) => puggc(answer, nggc));
 
 function puggc(answer, nggc) {
   // get component files from the ng g c output
@@ -64,21 +68,21 @@ function puggc(answer, nggc) {
       return obj;
     }, {});
 
-  fs.renameSync(files.html, files.pug);
+  fileSystem.renameSync(files.html, files.pug);
   const componentName = args[0].substring(args[0].lastIndexOf("/") + 1);
-  fs.writeFileSync(files.pug, "p " + componentName + " works!");
+  fileSystem.writeFileSync(files.pug, "p " + componentName + " works!");
 
   if (answer.style === "none") {
-    fs.rmSync(files.style);
+    fileSystem.rmSync(files.style);
   } else {
-    fs.renameSync(files.style, files.stylePref);
+    fileSystem.renameSync(files.style, files.stylePref);
   }
 
   if (answer.spec === "remove") {
-    fs.rmSync(files.spec);
+    fileSystem.rmSync(files.spec);
   }
 
-  const contents = String(fs.readFileSync(files.ts))
+  const contents = String(fileSystem.readFileSync(files.ts))
     .split("\n")
     .map((line) => {
       if (line.includes("templateUrl:")) {
@@ -101,14 +105,17 @@ function puggc(answer, nggc) {
     .filter((line) => line !== undefined)
     .join("\n");
 
-  fs.writeFileSync(files.ts, contents);
+  fileSystem.writeFileSync(files.ts, contents);
 
-  const terminalColor = (color, text) => {
-    return color + text;
+  const textColor = {
+    green: (text) => "\x1b[32m" + text,
+    default: (text) => "\x1b[0m" + text,
+    cyan: (text) => "\x1b[36m" + text,
   };
-  const green = (text) => terminalColor("\x1b[32m", text);
-  const reset = (text) => terminalColor("\x1b[0m", text);
-  const cyan = (text) => terminalColor("\x1b[36m", text);
 
-  console.log(green("✓"), reset("CREATED component:"), cyan(files.ts));
+  console.log(
+    textColor.green("✓"),
+    textColor.default("CREATED component:"),
+    textColor.cyan(files.ts)
+  );
 }
