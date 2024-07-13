@@ -1,6 +1,6 @@
 {
   "name": "puggc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Generate Angular components with .pug instead of .html",
   "main": "index.js",
   "scripts": {
